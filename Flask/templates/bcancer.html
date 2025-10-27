@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breast Cancer Detection Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007bff; /* A more modern blue */
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --font-family-sans-serif: 'Roboto', sans-serif;
+            --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        body {
+            font-family: var(--font-family-sans-serif);
+            background-color: var(--light-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.7;
+            color: var(--dark-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: #ffffff;
+            padding: 15px 30px;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .navbar-brand {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8em;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+         .navbar-brand i {
+            margin-right: 10px;
+            color: var(--danger-color);
+         }
+
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 700px;
+            margin: 0 20px; /* Add horizontal margin for smaller screens */
+        }
+
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+            margin-bottom: 0.8em;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+        }
+        h2 {
+            font-size: 1.6em;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+        }
+
+        .upload-section p {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .file-input-label {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .file-input-label i {
+            margin-right: 8px;
+        }
+
+        .file-input-label:hover {
+            background-color: #0056b3; /* Darker shade of primary */
+        }
+
+        #image-upload {
+            position: absolute;
+            font-size: 100px;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        #image-preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            display: none; /* Hidden by default */
+        }
+        
+        #file-name-display {
+            margin-top: 10px;
+            font-style: italic;
+            color: var(--secondary-color);
+        }
+
+        .btn-analyze {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s, transform 0.2s;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn-analyze i {
+            margin-right: 8px;
+        }
+
+        .btn-analyze:hover {
+            background-color: #c82333; /* Darker shade of danger */
+            transform: translateY(-2px);
+        }
+         .btn-analyze:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+
+        .result-section {
+            margin-top: 40px;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+            display: none; 
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #loading-spinner {
+            margin: 20px auto;
+            border: 4px solid #f3f3f3; 
+            border-top: 4px solid var(--primary-color); 
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: none; 
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .benign {
+            background-color: #e6ffed; 
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+        .benign .result-icon {
+            color: var(--success-color);
+        }
+
+        .malignant {
+            background-color: #ffeeee; 
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+        .malignant .result-icon {
+            color: var(--danger-color);
+        }
+
+        .instructions-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f0f4f8; 
+            border-radius: 8px;
+            font-size: 0.95em;
+            color: #555;
+        }
+        .instructions-section h3 {
+            color: var(--secondary-color);
+            font-size: 1.3em;
+        }
+        .instructions-section p {
+            margin-bottom: 10px;
+        }
+        .instructions-section strong {
+            color: var(--danger-color);
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            width: 100%;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+            .navbar-brand {
+                font-size: 1.5em;
+            }
+            .file-input-label, .btn-analyze {
+                padding: 10px 20px;
+                font-size: 0.95em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <i class="fas fa-microscope"></i>Breast Cancer Detection Tool
+        </a>
+    </nav>
+
+    <div class="container">
+        <h1>Histopathological Image Analysis</h1>
+        
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="upload-section">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Image</h2>
+                <p>Select a breast histopathology image (e.g., PNG, JPG) for AI-powered classification.</p>
+                
+                <div class="file-input-wrapper">
+                    <label for="image-upload" class="file-input-label">
+                        <i class="fas fa-file-image"></i> Choose File
+                    </label>
+                    <input type="file" name="image" id="image-upload" accept="image/*" required>
+                </div>
+                <div id="file-name-display">No file chosen</div>
+
+                <div id="image-preview-container">
+                    <img id="image-preview" src="#" alt="Image Preview">
+                </div>
+                
+                <button type="submit" class="btn-analyze" id="analyze-button" disabled>
+                    <i class="fas fa-cogs"></i> Analyze Image
+                </button>
+            </div>
+        </form>
+        
+        <div id="loading-spinner"></div>
+
+        <div id="result-output" class="result-section">
+            <h3>Analysis Result</h3>
+            <p id="result-text"></p>
+        </div>
+        
+        <div class="instructions-section">
+            <h3><i class="fas fa-info-circle"></i> About This System</h3>
+            <p>This application utilizes a sophisticated deep learning model, trained on a diverse dataset of histopathological images, to classify breast abnormalities as either <strong>benign</strong> or <strong>malignant</strong>.</p>
+            <p><strong>Disclaimer:</strong> This tool is intended for educational and research purposes only. It is <strong>NOT</strong> a substitute for professional medical advice, diagnosis, or treatment. Always consult with a qualified healthcare provider for any health concerns or before making any decisions related to your health.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 For Educational Purposes Only.</p>
+    </footer>
+
+    <script>
+        const uploadForm = document.getElementById('upload-form');
+        const imageUploadInput = document.getElementById('image-upload');
+        const imagePreview = document.getElementById('image-preview');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const analyzeButton = document.getElementById('analyze-button');
+        const resultDiv = document.getElementById('result-output');
+        const resultText = document.getElementById('result-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        imageUploadInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    imagePreview.src = event.target.result;
+                    imagePreview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+                fileNameDisplay.textContent = file.name;
+                analyzeButton.disabled = false; // Enable button when file is chosen
+                resultDiv.style.display = 'none'; // Hide previous results
+                resultText.textContent = ''; // Clear previous result text
+            } else {
+                imagePreview.style.display = 'none';
+                fileNameDisplay.textContent = 'No file chosen';
+                analyzeButton.disabled = true; // Disable button if no file
+            }
+        });
+
+        uploadForm.onsubmit = function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            // Show loading spinner and hide previous results
+            loadingSpinner.style.display = 'block';
+            resultDiv.style.display = 'none';
+            analyzeButton.disabled = true; // Disable button during analysis
+
+            // Simulate backend prediction
+            // Replace this with your actual fetch call
+            setTimeout(() => {
+                // Mock response - in reality, this comes from fetch
+                // const isMalignant = Math.random() < 0.5; 
+                // const predictionText = isMalignant ? "Prediction: Malignant (High Confidence)" : "Prediction: Benign (High Confidence)";
+                
+                // For testing the fetch (assuming you have a backend at /predict)
+                fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    displayResult(data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    displayResult(`Error: Could not get prediction. ${error.message}. Please ensure the server is running or check the image format.`);
+                    resultDiv.className = 'result-section malignant'; // Style error as malignant/warning
+                })
+                .finally(() => {
+                    loadingSpinner.style.display = 'none';
+                    analyzeButton.disabled = false; // Re-enable button
+                     // Don't re-enable if no file is selected after submission (edge case)
+                    if (!imageUploadInput.files || imageUploadInput.files.length === 0) {
+                        analyzeButton.disabled = true;
+                    }
+                });
+
+            }, 1500); // Simulate network delay
+        };
+
+        function displayResult(data) {
+            resultText.textContent = data;
+            resultDiv.style.display = 'block';
+            
+            // Clear existing icons first
+            const existingIcon = resultDiv.querySelector('.result-icon');
+            if (existingIcon) {
+                existingIcon.remove();
+            }
+
+            let iconClass = '';
+            let iconElement = document.createElement('i');
+
+            if (data.toLowerCase().includes('benign')) {
+                resultDiv.className = 'result-section benign';
+                iconClass = 'fas fa-check-circle result-icon';
+            } else if (data.toLowerCase().includes('malignant')) {
+                resultDiv.className = 'result-section malignant';
+                iconClass = 'fas fa-exclamation-triangle result-icon';
+            } else { // For errors or uncertain results
+                resultDiv.className = 'result-section malignant'; // Default to warning style
+                iconClass = 'fas fa-times-circle result-icon';
+            }
+            
+            iconElement.className = iconClass;
+            resultDiv.insertBefore(iconElement, resultDiv.firstChild); // Prepend icon
+        }
+
+        // Initial state for analyze button
+        analyzeButton.disabled = true;
+
+    </script>
+</body>
+</html>
