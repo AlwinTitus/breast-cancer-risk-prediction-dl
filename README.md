@@ -15,7 +15,9 @@ This project builds a CNN model to automatically classify breast histopathology 
 The project uses a breast cancer histopathology image dataset with the following structure:
 ![dataset-structure](dataset_structure.png)
 
-**Note:** The dataset is not included in this repository due to size constraints. Please see the _"Getting Started"_ section for instructions on how to obtain and prepare the dataset.
+**Note:** The dataset is not included in this repository due to size constraints. Please visit the given link to download the dataset - https://www.kaggle.com/datasets/paultimothymooney/breast-histopathology-images
+
+Extract it to the `breastcancerdataset/` folder in the project root
 
 ## Project Workflow
 1. **Download the dataset** - Instructions for obtaining the histopathology image dataset
@@ -32,3 +34,4 @@ The model consists of:
 • Max pooling after each convolutional layer  
 • Dropout layer to prevent overfitting  
 • Dense layer with sigmoid activation for binary classification
+
